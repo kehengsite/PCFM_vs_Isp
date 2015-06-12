@@ -1,0 +1,210 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>PCFM_vs_Isp</title><meta name="generator" content="MATLAB 8.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-06-12"><meta name="DC.source" content="PCFM_vs_Isp.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Description</a></li><li><a href="#2">Initialization</a></li><li><a href="#3">Input Parameters</a></li><li><a href="#4">Implementation Algorithm</a></li><li><a href="#5">Output Plotting</a></li></ul></div><h2>Description<a name="1"></a></h2><pre class="codeinput"><span class="comment">% PCFM_vs_Isp.m</span>
+<span class="comment">% Propellant Consumption Fraction of Mass vs. Specific Impulse</span>
+<span class="comment">% Coding by Kehengsite at 2015/06/09 12:48</span>
+</pre><h2>Initialization<a name="2"></a></h2><pre class="codeinput">close <span class="string">all</span>, clear <span class="string">all</span>, clc
+</pre><h2>Input Parameters<a name="3"></a></h2><pre class="codeinput">Isp = logspace(2, 4, 100000);   <span class="comment">% Specific Impulse</span>
+<span class="comment">% Specify DV(Delta V) and Gravity Constant</span>
+TemData = [200 500 1000 2000 3000 5000 8000 12500 20000 30000];
+DeltaV  = TemData'; g = 9.80665;
+</pre><h2>Implementation Algorithm<a name="4"></a></h2><pre class="codeinput">PCFM = 1 - exp(-DeltaV*(1./(g*Isp)));   <span class="comment">% PCFM = 1 - exp(-DeltaV/(g*Isp))</span>
+</pre><h2>Output Plotting<a name="5"></a></h2><pre class="codeinput">figure
+<span class="comment">% PCFM vs. Isp for specfic DV</span>
+plot(Isp, PCFM, <span class="string">'-'</span>, <span class="string">'LineWidth'</span>, 2);hold <span class="string">on</span>
+<span class="comment">% CE(Chemical Propellant) and PE(Electric Propulsion) lines</span>
+plot([ 160, 160], [0,    1], <span class="string">'-.k'</span>, <span class="string">'LineWidth'</span>, 1.2)
+plot([ 400, 400], [0,    1], <span class="string">'-.k'</span>, <span class="string">'LineWidth'</span>, 1.2)
+plot([2000,2000], [0, 0.79], <span class="string">'-.k'</span>, <span class="string">'LineWidth'</span>, 1.2)
+
+<span class="comment">% Figure decorating</span>
+title(<span class="string">'Relationship between PCFM and Isp'</span>, <span class="string">'LineWidth'</span>, 2, <span class="string">'FontSize'</span>, 13)
+xlabel(<span class="string">'Specific Impulse (Isp/sec)'</span>, <span class="string">'LineWidth'</span>, 3, <span class="string">'FontSize'</span>, 12)
+ylabel(<span class="string">'Propellant Consumption Fraction of Mass (m_p/m_{initial})'</span>, <span class="string">'LineWidth'</span>, 3, <span class="string">'FontSize'</span>, 12)
+
+<span class="comment">% Chemical Propellant region</span>
+set(text(160, 0.735, <span class="string">'\leftarrow'</span>), <span class="string">'FontSize'</span>, 12, <span class="string">'Color'</span>, <span class="string">'r'</span>, <span class="string">'LineWidth'</span>, 2)
+set(text(250, 0.735, <span class="string">'CP'</span>), <span class="string">'FontSize'</span>, 12, <span class="string">'Color'</span>, <span class="string">'r'</span>, <span class="string">'LineWidth'</span>, 2)
+set(text(360, 0.735, <span class="string">'\rightarrow'</span>), <span class="string">'FontSize'</span>, 12, <span class="string">'Color'</span>, <span class="string">'r'</span>, <span class="string">'LineWidth'</span>, 2)
+<span class="comment">% Chemical Propellant region</span>
+set(text( 400, 0.735, <span class="string">'\leftarrow'</span>), <span class="string">'FontSize'</span>, 12, <span class="string">'Color'</span>, <span class="string">'r'</span>, <span class="string">'LineWidth'</span>, 2)
+set(text( 750, 0.735, <span class="string">'EP'</span>), <span class="string">'FontSize'</span>, 12, <span class="string">'Color'</span>, <span class="string">'r'</span>, <span class="string">'LineWidth'</span>, 2)
+set(text(1800, 0.735, <span class="string">'\rightarrow'</span>), <span class="string">'FontSize'</span>, 12, <span class="string">'Color'</span>, <span class="string">'r'</span>, <span class="string">'LineWidth'</span>, 2)
+
+set(gca, <span class="string">'xscale'</span>, <span class="string">'log'</span>)   <span class="comment">% Setting X axis displaying format -&gt; logarithmic form</span>
+set(gca, <span class="string">'FontSize'</span>, 12)    <span class="comment">% Setting the size of axes displaying font -&gt; 12</span>
+<span class="comment">% set(gca, 'ylim', [-0.005,1.005], 'xlim', [90, 10010])</span>
+
+set(text( 120,0.12, <span class="string">'\DeltaV=0.2km/s'</span>),   <span class="string">'FontSize'</span>, 12)
+set(text( 150,0.22, <span class="string">'\DeltaV=0.5km/s'</span>),   <span class="string">'FontSize'</span>, 12)
+set(text( 200,0.32, <span class="string">'\DeltaV=1km/s'</span>),     <span class="string">'FontSize'</span>, 12)
+set(text( 255,0.44, <span class="string">'\DeltaV=2km/s'</span>),     <span class="string">'FontSize'</span>, 12)
+set(text( 300,0.55, <span class="string">'\DeltaV=3km/s'</span>),     <span class="string">'FontSize'</span>, 12)
+set(text( 400,0.65, <span class="string">'\DeltaV=5km/s'</span>),     <span class="string">'FontSize'</span>, 12)
+set(text( 650,0.60, <span class="string">'\DeltaV=8km/s'</span>),     <span class="string">'FontSize'</span>, 12)
+set(text(1250,0.55, <span class="string">'\DeltaV=12.5km/s'</span>),  <span class="string">'FontSize'</span>, 12)
+set(text(2250,0.50, <span class="string">'\DeltaV=20km/s'</span>),    <span class="string">'FontSize'</span>, 12)
+set(text(4000,0.45, <span class="string">'\DeltaV=30km/s'</span>),    <span class="string">'FontSize'</span>, 12)
+
+set(text(2250,0.955,<span class="string">'Spacecraft Initial mass: m_{initial}'</span>),<span class="string">'FontSize'</span>,12,<span class="string">'Color'</span>,[0.67 0.00 1])
+set(text(2250,0.900,<span class="string">'Propellant mass: m_p'</span>),<span class="string">'FontSize'</span>,12,<span class="string">'Color'</span>,[0.67 0.00 1])
+set(text(2250,0.845,<span class="string">'m_p=m_{initial}[1-exp(-\Deltav/gI_{sp})]'</span>),<span class="string">'FontSize'</span>,12,<span class="string">'Color'</span>,[0.67 0.00 1])
+
+<span class="comment">% Figure's displying position on computer screen</span>
+<span class="comment">% Format -&gt; [Ix_pixel Iy_pixel Fx_pixel Fy_pixel]</span>
+set(gcf,<span class="string">'Position'</span>,[435 50 875 600])
+
+<span class="comment">% Output the figure with .eps format</span>
+print <span class="string">-depsc</span> <span class="string">-tiff</span> <span class="string">-r300</span> <span class="string">PCFM_vs_Isp.eps</span>
+
+<span class="comment">% Output the figure with .pdf format</span>
+set(gcf,<span class="string">'Units'</span>,<span class="string">'centimeters'</span>);
+screenposition = get(gcf,<span class="string">'Position'</span>);
+set(gcf,<span class="string">'PaperPosition'</span>,[0 0 screenposition(3:4)],<span class="string">'PaperSize'</span>,[screenposition(3:4)]);
+print <span class="string">-dpdf</span> <span class="string">-painters</span> <span class="string">PCFM_vs_Isp.pdf</span>
+
+hold <span class="string">off</span>
+</pre><img vspace="5" hspace="5" src="PCFM_vs_Isp_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Description
+
+% PCFM_vs_Isp.m
+% Propellant Consumption Fraction of Mass vs. Specific Impulse
+% Coding by Kehengsite at 2015/06/09 12:48
+
+%% Initialization
+close all, clear all, clc
+
+%% Input Parameters
+Isp = logspace(2, 4, 100000);   % Specific Impulse
+% Specify DV(Delta V) and Gravity Constant
+TemData = [200 500 1000 2000 3000 5000 8000 12500 20000 30000];
+DeltaV  = TemData'; g = 9.80665;
+
+%% Implementation Algorithm
+PCFM = 1 - exp(-DeltaV*(1./(g*Isp)));   % PCFM = 1 - exp(-DeltaV/(g*Isp))
+
+%% Output Plotting
+figure
+% PCFM vs. Isp for specfic DV
+plot(Isp, PCFM, '-', 'LineWidth', 2);hold on
+% CE(Chemical Propellant) and PE(Electric Propulsion) lines
+plot([ 160, 160], [0,    1], '-.k', 'LineWidth', 1.2)
+plot([ 400, 400], [0,    1], '-.k', 'LineWidth', 1.2)
+plot([2000,2000], [0, 0.79], '-.k', 'LineWidth', 1.2)
+
+% Figure decorating
+title('Relationship between PCFM and Isp', 'LineWidth', 2, 'FontSize', 13)
+xlabel('Specific Impulse (Isp/sec)', 'LineWidth', 3, 'FontSize', 12)
+ylabel('Propellant Consumption Fraction of Mass (m_p/m_{initial})', 'LineWidth', 3, 'FontSize', 12)
+
+% Chemical Propellant region
+set(text(160, 0.735, '\leftarrow'), 'FontSize', 12, 'Color', 'r', 'LineWidth', 2)
+set(text(250, 0.735, 'CP'), 'FontSize', 12, 'Color', 'r', 'LineWidth', 2)
+set(text(360, 0.735, '\rightarrow'), 'FontSize', 12, 'Color', 'r', 'LineWidth', 2)
+% Chemical Propellant region
+set(text( 400, 0.735, '\leftarrow'), 'FontSize', 12, 'Color', 'r', 'LineWidth', 2)
+set(text( 750, 0.735, 'EP'), 'FontSize', 12, 'Color', 'r', 'LineWidth', 2)
+set(text(1800, 0.735, '\rightarrow'), 'FontSize', 12, 'Color', 'r', 'LineWidth', 2)
+
+set(gca, 'xscale', 'log')   % Setting X axis displaying format -> logarithmic form 
+set(gca, 'FontSize', 12)    % Setting the size of axes displaying font -> 12
+% set(gca, 'ylim', [-0.005,1.005], 'xlim', [90, 10010])
+
+set(text( 120,0.12, '\DeltaV=0.2km/s'),   'FontSize', 12)
+set(text( 150,0.22, '\DeltaV=0.5km/s'),   'FontSize', 12)
+set(text( 200,0.32, '\DeltaV=1km/s'),     'FontSize', 12)
+set(text( 255,0.44, '\DeltaV=2km/s'),     'FontSize', 12)
+set(text( 300,0.55, '\DeltaV=3km/s'),     'FontSize', 12)
+set(text( 400,0.65, '\DeltaV=5km/s'),     'FontSize', 12)
+set(text( 650,0.60, '\DeltaV=8km/s'),     'FontSize', 12)
+set(text(1250,0.55, '\DeltaV=12.5km/s'),  'FontSize', 12)
+set(text(2250,0.50, '\DeltaV=20km/s'),    'FontSize', 12)
+set(text(4000,0.45, '\DeltaV=30km/s'),    'FontSize', 12)
+
+set(text(2250,0.955,'Spacecraft Initial mass: m_{initial}'),'FontSize',12,'Color',[0.67 0.00 1])
+set(text(2250,0.900,'Propellant mass: m_p'),'FontSize',12,'Color',[0.67 0.00 1])
+set(text(2250,0.845,'m_p=m_{initial}[1-exp(-\Deltav/gI_{sp})]'),'FontSize',12,'Color',[0.67 0.00 1])
+
+% Figure's displying position on computer screen
+% Format -> [Ix_pixel Iy_pixel Fx_pixel Fy_pixel]
+set(gcf,'Position',[435 50 875 600])
+
+% Output the figure with .eps format
+print -depsc -tiff -r300 PCFM_vs_Isp.eps
+
+% Output the figure with .pdf format
+set(gcf,'Units','centimeters');
+screenposition = get(gcf,'Position');
+set(gcf,'PaperPosition',[0 0 screenposition(3:4)],'PaperSize',[screenposition(3:4)]);
+print -dpdf -painters PCFM_vs_Isp.pdf 
+
+hold off
+
+##### SOURCE END #####
+--></body></html>

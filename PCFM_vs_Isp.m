@@ -1,7 +1,7 @@
 %% Description
 
-% PMF_vs_Isp.m
-% Propellant Mass Fraction vs. Isp
+% PCFM_vs_Isp.m
+% Propellant Consumption Fraction of Mass vs. Specific Impulse
 % Coding by Kehengsite at 2015/06/09 12:48
 
 %% Initialization
@@ -14,20 +14,19 @@ TemData = [200 500 1000 2000 3000 5000 8000 12500 20000 30000];
 DeltaV  = TemData'; g = 9.80665;
 
 %% Implementation Algorithm
-PMF = 1 - exp(-DeltaV*(1./(g*Isp)));   % PMF = 1 - exp(-DeltaV/(g*Isp))
+PCFM = 1 - exp(-DeltaV*(1./(g*Isp)));   % PCFM = 1 - exp(-DeltaV/(g*Isp))
 
 %% Output Plotting
 figure
-% Isp vs. DM for specfic DV
-plot(Isp, PMF, '-', 'LineWidth', 2);hold on
+% PCFM vs. Isp for specfic DV
+plot(Isp, PCFM, '-', 'LineWidth', 2);hold on
 % CE(Chemical Propellant) and PE(Electric Propulsion) lines
 plot([ 160, 160], [0,    1], '-.k', 'LineWidth', 1.2)
 plot([ 400, 400], [0,    1], '-.k', 'LineWidth', 1.2)
 plot([2000,2000], [0, 0.79], '-.k', 'LineWidth', 1.2)
-hold off
 
-%% Figure Decorating
-title('Relationship between Propellant Consumption and Specific Impulse', 'LineWidth', 2, 'FontSize', 13)
+% Figure decorating
+title('Relationship between PCFM and Isp', 'LineWidth', 2, 'FontSize', 13)
 xlabel('Specific Impulse (Isp/sec)', 'LineWidth', 3, 'FontSize', 12)
 ylabel('Propellant Consumption Fraction of Mass (m_p/m_{initial})', 'LineWidth', 3, 'FontSize', 12)
 
@@ -59,17 +58,17 @@ set(text(2250,0.955,'Spacecraft Initial mass: m_{initial}'),'FontSize',12,'Color
 set(text(2250,0.900,'Propellant mass: m_p'),'FontSize',12,'Color',[0.67 0.00 1])
 set(text(2250,0.845,'m_p=m_{initial}[1-exp(-\Deltav/gI_{sp})]'),'FontSize',12,'Color',[0.67 0.00 1])
 
-%% Output Showing
-
 % Figure's displying position on computer screen
 % Format -> [Ix_pixel Iy_pixel Fx_pixel Fy_pixel]
 set(gcf,'Position',[435 50 875 600])
 
 % Output the figure with .eps format
-print -depsc -tiff -r300 pmf_vs_dm.eps
+print -depsc -tiff -r300 PCFM_vs_Isp.eps
 
 % Output the figure with .pdf format
 set(gcf,'Units','centimeters');
 screenposition = get(gcf,'Position');
 set(gcf,'PaperPosition',[0 0 screenposition(3:4)],'PaperSize',[screenposition(3:4)]);
-print -dpdf -painters pmf_vs_dm.pdf 
+print -dpdf -painters PCFM_vs_Isp.pdf 
+
+hold off
